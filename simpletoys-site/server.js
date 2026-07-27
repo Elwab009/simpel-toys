@@ -9,6 +9,7 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const emailjs = require('@emailjs/nodejs');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -37,15 +38,33 @@ const trackLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { e
 // ---------- Données ----------
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
 const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
+const IMAGES_DIR = path.join(__dirname, 'data', 'images');
 
 function loadProducts() { return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8')); }
 function ensureDataFiles() {
   const dataDir = path.join(__dirname, 'data');
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
   if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]');
   if (!fs.existsSync(PRODUCTS_FILE)) fs.writeFileSync(PRODUCTS_FILE, '[]');
 }
 ensureDataFiles();
+
+// Les photos produits sont stockées dans data/images/ (dans le volume persistant
+// Railway) plutôt que dans public/images/, qui lui est effacé à chaque déploiement.
+app.use('/uploads', express.static(IMAGES_DIR));
+
+const productImageUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, IMAGES_DIR),
+    filename: (req, file, cb) => cb(null, `${req.params.ref}${path.extname(file.originalname).toLowerCase()}`)
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 Mo max
+  fileFilter: (req, file, cb) => {
+    const ok = ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype);
+    cb(ok ? null : new Error('Format d\'image non autorisé (JPG, PNG ou WEBP uniquement).'), ok);
+  }
+});
 
 function loadOrders() { return JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf-8')); }
 function saveOrders(orders) { fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2)); }
@@ -287,13 +306,38 @@ app.post('/api/admin/products', requireAdmin, (req, res) => {
   if (!ref || !name || price == null || qty == null || !cat) return res.status(400).json({ error: 'Champs manquants.' });
   const idx = products.findIndex(p => p.ref === String(ref));
   const entry = { ref: String(ref), name, price: parseFloat(price), qty: parseInt(qty, 10), cat };
-  if (idx >= 0) products[idx] = entry; else products.push(entry);
+  if (idx >= 0) {
+    if (products[idx].image) entry.image = products[idx].image; // on garde la photo déjà uploadée
+    products[idx] = entry;
+  } else {
+    products.push(entry);
+  }
   fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
   res.json({ success: true });
 });
 
+app.post('/api/admin/products/:ref/image', requireAdmin, (req, res) => {
+  productImageUpload.single('image')(req, res, (err) => {
+    if (err) return res.status(400).json({ error: err.message });
+    if (!req.file) return res.status(400).json({ error: 'Aucune image reçue.' });
+
+    const products = loadProducts();
+    const idx = products.findIndex(p => p.ref === req.params.ref);
+    if (idx < 0) return res.status(404).json({ error: 'Produit introuvable.' });
+
+    products[idx].image = `/uploads/${req.file.filename}`;
+    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+    res.json({ success: true, image: products[idx].image });
+  });
+});
+
 app.delete('/api/admin/products/:ref', requireAdmin, (req, res) => {
   let products = loadProducts();
+  const product = products.find(p => p.ref === req.params.ref);
+  if (product && product.image) {
+    const filePath = path.join(IMAGES_DIR, path.basename(product.image));
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
   products = products.filter(p => p.ref !== req.params.ref);
   fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
   res.json({ success: true });
