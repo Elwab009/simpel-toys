@@ -34,6 +34,17 @@ const trackLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { e
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
 const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
 
+// Crée le dossier data/ et les fichiers manquants au démarrage, pour éviter
+// tout crash "ENOENT" si le dossier data/ n'a pas été déployé (ex: fichier
+// exclu par .gitignore, premier démarrage sur un nouvel environnement...).
+function ensureDataFiles() {
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  if (!fs.existsSync(ORDERS_FILE)) fs.writeFileSync(ORDERS_FILE, '[]');
+  if (!fs.existsSync(PRODUCTS_FILE)) fs.writeFileSync(PRODUCTS_FILE, '[]');
+}
+ensureDataFiles();
+
 function loadProducts() { return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8')); }
 function loadOrders() { return JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf-8')); }
 function saveOrders(orders) { fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2)); }
