@@ -441,7 +441,7 @@
                 ref_label: 'RÉF', stock_label: 'Stock',
                 stock_available: '📦 Stock disponible : {n} unités',
                 cod_box_title: '🔒 Paiement à la livraison',
-                cod_box_text: 'Payez en espèces à la réception de votre commande. Aucune donnée bancaire requise. Vente réservée aux professionnels.',
+                cod_box_text: 'Payez en espèces à la réception de votre commande. Livraison uniquement à Casablanca et Bouskoura. Vente réservée aux professionnels.',
                 btn_add_cart: 'Ajouter au panier',
                 price_unit_default: 'Prix unitaire',
                 product_added_alert: 'Produit ajouté à votre commande !',
@@ -451,7 +451,8 @@
                 cart_total: 'Total :',
                 delivery_info_title: 'Informations de livraison',
                 placeholder_fullname: 'Nom & Prénom', placeholder_company: 'Nom de la Société (optionnel)', placeholder_phone: 'Téléphone',
-                placeholder_city: 'Ville / Pays', placeholder_address: 'Adresse complète de livraison', placeholder_notes: 'Instructions de commande (optionnel)',
+                placeholder_city: 'Ville', placeholder_address: 'Adresse complète de livraison', placeholder_notes: 'Instructions de commande (optionnel)',
+                delivery_zone_notice: 'Livraison disponible uniquement à Casablanca et Bouskoura.',
                 payment_title: 'Mode de paiement',
                 cod_note_title: '💵 Paiement en espèces à la livraison',
                 cod_note_text: "C'est le seul mode de paiement disponible : vous payez en liquide au livreur, à la réception de votre colis. Aucune information bancaire ne vous sera jamais demandée.",
@@ -511,7 +512,7 @@
                 ref_label: 'المرجع', stock_label: 'الستوك',
                 stock_available: '📦 الستوك المتوفر: {n} وحدة',
                 cod_box_title: '🔒 الخلاص عند التوصيل',
-                cod_box_text: 'خلص كاش منين توصلك السلعة. ما كاينش معلومات بنكية مطلوبة. البيع غير للمحترفين.',
+                cod_box_text: 'خلص كاش منين توصلك السلعة. التوصيل كاين غير فالدار البيضاء وبوسكورة. البيع غير للمحترفين.',
                 btn_add_cart: 'زيد للكارطة',
                 price_unit_default: 'ثمن الوحدة',
                 product_added_alert: 'المنتوج تزاد للطلب ديالك!',
@@ -521,7 +522,8 @@
                 cart_total: 'المجموع:',
                 delivery_info_title: 'معلومات التوصيل',
                 placeholder_fullname: 'السمية الكاملة', placeholder_company: 'سمية الشركة (اختياري)', placeholder_phone: 'التيليفون',
-                placeholder_city: 'المدينة / البلاد', placeholder_address: 'العنوان الكامل ديال التوصيل', placeholder_notes: 'تعليمات الطلب (اختياري)',
+                placeholder_city: 'المدينة', placeholder_address: 'العنوان الكامل ديال التوصيل', placeholder_notes: 'تعليمات الطلب (اختياري)',
+                delivery_zone_notice: 'التوصيل كاين غير فالدار البيضاء وبوسكورة.',
                 payment_title: 'طريقة الخلاص',
                 cod_note_title: '💵 الخلاص كاش عند التوصيل',
                 cod_note_text: 'هادي هي الطريقة الوحيدة ديال الخلاص: تخلص كاش للموصل، منين توصلك السلعة. ماغاديش نطلبو منك أي معلومة بنكية.',
@@ -809,7 +811,14 @@
                         <input type="text" id="ord-company" placeholder="${t('placeholder_company')}" class="w-full px-4 py-2 border rounded">
                         <input type="email" id="ord-email" placeholder="${t('placeholder_email')}" required class="w-full px-4 py-2 border rounded">
                         <input type="tel" id="ord-phone" placeholder="${t('placeholder_phone')}" required class="w-full px-4 py-2 border rounded">
-                        <input type="text" id="ord-city" placeholder="${t('placeholder_city')}" required class="w-full md:col-span-2 px-4 py-2 border rounded">
+                        <div class="w-full md:col-span-2">
+                            <select id="ord-city" required class="w-full px-4 py-2 border rounded bg-white">
+                                <option value="">${t('placeholder_city')}</option>
+                                <option value="Casablanca">Casablanca</option>
+                                <option value="Bouskoura">Bouskoura</option>
+                            </select>
+                            <p class="text-xs text-teal mt-1">🚚 ${t('delivery_zone_notice')}</p>
+                        </div>
                         <input type="text" id="ord-address" placeholder="${t('placeholder_address')}" required class="w-full md:col-span-2 px-4 py-2 border rounded">
                         <textarea id="ord-notes" placeholder="${t('placeholder_notes')}" rows="3" class="w-full md:col-span-2 px-4 py-2 border rounded"></textarea>
                     </div>
@@ -1020,6 +1029,7 @@
                                     <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-xs border rounded px-2 py-1">
                                         ${ADMIN_STATUS_OPTIONS.map(s => `<option value="${s.value}" ${s.value === o.status ? 'selected' : ''}>${s.label}</option>`).join('')}
                                     </select>
+                                    <button onclick="deleteOrder('${o.id}')" class="block ml-auto mt-2 text-xs text-red-500 hover:underline">Supprimer</button>
                                 </div>
                             </div>
                             <p class="text-xs text-gray-500 mt-2">${o.items.map(it => `${it.qty}x ${it.name}`).join(', ')}</p>
@@ -1042,6 +1052,16 @@
             } catch (err) {
                 alert('Erreur: ' + err.message);
                 renderAdmin();
+            }
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm('Supprimer définitivement cette commande ? Cette action est irréversible.')) return;
+            try {
+                await adminFetch(`/api/admin/orders/${orderId}`, { method: 'DELETE' });
+                renderAdmin();
+            } catch (err) {
+                alert('Erreur: ' + err.message);
             }
         }
 
