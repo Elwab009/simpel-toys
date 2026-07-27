@@ -8,19 +8,23 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const emailjs = require('@emailjs/nodejs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ---------- Vérification de la config au démarrage ----------
-const REQUIRED_ENV = ['JWT_SECRET', 'ADMIN_PASSWORD_HASH', 'EMAIL_USER', 'EMAIL_APP_PASSWORD'];
+const REQUIRED_ENV = ['JWT_SECRET', 'ADMIN_PASSWORD_HASH', 'EMAIL_USER', 'EMAILJS_SERVICE_ID', 'EMAILJS_TEMPLATE_ID', 'EMAILJS_PUBLIC_KEY', 'EMAILJS_PRIVATE_KEY'];
 const missing = REQUIRED_ENV.filter(k => !process.env[k]);
 if (missing.length) {
   console.warn(`⚠️  Variables d'environnement manquantes: ${missing.join(', ')}. Voir le fichier .env.example`);
 }
 
 // ---------- Sécurité de base ----------
+// Railway (comme la plupart des hébergeurs) place le site derrière un proxy inverse.
+// Sans ce réglage, express-rate-limit ne peut pas identifier correctement les visiteurs.
+app.set('trust proxy', 1);
+
 app.use(helmet({ contentSecurityPolicy: false })); // le front utilise des CDN (Tailwind, Font Awesome)
 app.use(cors({ origin: process.env.SITE_URL || true, credentials: true }));
 app.use(express.json({ limit: '200kb' }));
@@ -34,9 +38,7 @@ const trackLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 30, message: { e
 const PRODUCTS_FILE = path.join(__dirname, 'data', 'products.json');
 const ORDERS_FILE = path.join(__dirname, 'data', 'orders.json');
 
-// Crée le dossier data/ et les fichiers manquants au démarrage, pour éviter
-// tout crash "ENOENT" si le dossier data/ n'a pas été déployé (ex: fichier
-// exclu par .gitignore, premier démarrage sur un nouvel environnement...).
+function loadProducts() { return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8')); }
 function ensureDataFiles() {
   const dataDir = path.join(__dirname, 'data');
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
@@ -45,7 +47,6 @@ function ensureDataFiles() {
 }
 ensureDataFiles();
 
-function loadProducts() { return JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8')); }
 function loadOrders() { return JSON.parse(fs.readFileSync(ORDERS_FILE, 'utf-8')); }
 function saveOrders(orders) { fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2)); }
 
@@ -59,11 +60,22 @@ const STATUS_LABELS_FR = {
   annulee: 'Annulée'
 };
 
-// ---------- Email (Gmail via mot de passe d'application) ----------
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_APP_PASSWORD }
+// ---------- Email (EmailJS — envoi par API HTTPS, fonctionne même quand l'hébergeur bloque le SMTP) ----------
+emailjs.init({
+  publicKey: process.env.EMAILJS_PUBLIC_KEY,
+  privateKey: process.env.EMAILJS_PRIVATE_KEY
 });
+
+// Un seul template EmailJS générique est utilisé pour tous les emails du site.
+// Ce template doit contenir 3 variables : {{to_email}}, {{subject}}, {{html_body}}
+// (voir le README pour la configuration exacte du template dans le tableau de bord EmailJS).
+async function sendEmail(toEmail, subject, htmlBody) {
+  await emailjs.send(process.env.EMAILJS_SERVICE_ID, process.env.EMAILJS_TEMPLATE_ID, {
+    to_email: toEmail,
+    subject,
+    html_body: htmlBody
+  });
+}
 
 function orderNumber(order) {
   const d = new Date(order.createdAt);
@@ -104,19 +116,8 @@ async function sendOrderEmails(order) {
     <p>— L'équipe Simple Toys Maroc<br>Derb Omar, Casablanca | 0661 13 88 31</p>
   `;
 
-  await transporter.sendMail({
-    from: `"Simple Toys Maroc" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_USER,
-    subject: `🛒 Nouvelle commande ${num} — ${order.total.toFixed(2)} DHS`,
-    html: adminHtml
-  });
-
-  await transporter.sendMail({
-    from: `"Simple Toys Maroc" <${process.env.EMAIL_USER}>`,
-    to: order.customer.email,
-    subject: `Confirmation de votre commande ${num} — Simple Toys Maroc`,
-    html: customerHtml
-  });
+  await sendEmail(process.env.EMAIL_USER, `🛒 Nouvelle commande ${num} — ${order.total.toFixed(2)} DHS`, adminHtml);
+  await sendEmail(order.customer.email, `Confirmation de votre commande ${num} — Simple Toys Maroc`, customerHtml);
 }
 
 async function sendStatusUpdateEmail(order) {
@@ -130,12 +131,7 @@ async function sendStatusUpdateEmail(order) {
     <p>Vous pouvez suivre votre commande à tout moment sur notre site avec le numéro <strong>${num}</strong>.</p>
     <p>— L'équipe Simple Toys Maroc<br>0661 13 88 31</p>
   `;
-  await transporter.sendMail({
-    from: `"Simple Toys Maroc" <${process.env.EMAIL_USER}>`,
-    to: order.customer.email,
-    subject: `Votre commande ${num} — ${label}`,
-    html
-  });
+  await sendEmail(order.customer.email, `Votre commande ${num} — ${label}`, html);
 }
 
 // ---------- Validation & calcul serveur du panier (prix fixe, anti-triche) ----------
