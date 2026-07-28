@@ -132,7 +132,7 @@ async function sendOrderEmails(order) {
     <p style="font-size:18px;"><strong>Total: ${order.total.toFixed(2)} DHS</strong></p>
     <p>Vous pouvez suivre l'état de votre commande à tout moment sur notre site, section « Suivre ma commande », avec le numéro <strong>${num}</strong>.</p>
     <p>Notre équipe vous contactera sous 24h au ${order.customer.phone}.</p>
-    <p>— L'équipe Simple Toys Maroc<br>Derb Omar, Casablanca | 0661 13 88 31</p>
+    <p>— L'équipe Simple Toys Maroc<br>Derb Omar, Casablanca | 0669 09 46 56</p>
   `;
 
   await sendEmail(process.env.EMAIL_USER, `🛒 Nouvelle commande ${num} — ${order.total.toFixed(2)} DHS`, adminHtml);
@@ -148,7 +148,7 @@ async function sendStatusUpdateEmail(order) {
     <p>Le statut de votre commande vient de changer :</p>
     <p style="font-size:20px;"><strong>${label}</strong></p>
     <p>Vous pouvez suivre votre commande à tout moment sur notre site avec le numéro <strong>${num}</strong>.</p>
-    <p>— L'équipe Simple Toys Maroc<br>0661 13 88 31</p>
+    <p>— L'équipe Simple Toys Maroc<br>0669 09 46 56</p>
   `;
   await sendEmail(order.customer.email, `Votre commande ${num} — ${label}`, html);
 }
