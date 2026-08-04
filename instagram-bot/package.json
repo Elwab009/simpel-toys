@@ -1,0 +1,16 @@
+{
+  "name": "simpletoys-instagram-bot",
+  "version": "1.0.0",
+  "description": "Publie automatiquement chaque jour un produit Simple Toys Maroc sur Instagram (image + legende FR/Darija + hashtags), sans jamais repeter le produit de la veille.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
+  }
+}
