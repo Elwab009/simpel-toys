@@ -2,12 +2,24 @@ name: Post Instagram quotidien Simple Toys
 
 on:
   schedule:
-    # 10h00 heure du Maroc (UTC+0/+1 selon saison) -> 9h00 UTC, ajustable
+    - cron: '0 8 * * *'
     - cron: '0 9 * * *'
-  workflow_dispatch: {} # permet aussi de le lancer manuellement depuis l'onglet Actions
+    - cron: '0 10 * * *'
+    - cron: '0 11 * * *'
+    - cron: '0 12 * * *'
+    - cron: '0 13 * * *'
+    - cron: '0 14 * * *'
+    - cron: '0 15 * * *'
+    - cron: '0 16 * * *'
+    - cron: '0 17 * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: instagram-daily-post
+  cancel-in-progress: false
 
 permissions:
-  contents: write # necessaire pour que le bot committe l'image generee
+  contents: write
 
 jobs:
   post:
@@ -27,19 +39,19 @@ jobs:
       - name: Installer les dependances
         run: npm install
 
-      - name: Etape 1 - Generer l'image et la legende du jour
+      - name: Etape 1 - Generer l'image et la legende du post
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node index.js
-        # MODE par defaut = 'generate'
 
       - name: Committer et pousser l'image generee
         run: |
           git config user.name "simpletoys-bot"
           git config user.email "bot@simpletoys.local"
           git add posts/ data/pending.json
-          git commit -m "🧸 Post automatique du $(date +'%Y-%m-%d')" || echo "Rien a committer"
+          git commit -m "Post automatique" || echo "Rien a committer"
+          git pull --rebase origin main
           git push
 
       - name: Attendre que GitHub rende l'image accessible publiquement
@@ -56,5 +68,6 @@ jobs:
           git config user.name "simpletoys-bot"
           git config user.email "bot@simpletoys.local"
           git add data/history.json data/pending.json
-          git commit -m "🗂️ Mise a jour historique anti-repetition" || echo "Rien a committer"
+          git commit -m "Mise a jour historique" || echo "Rien a committer"
+          git pull --rebase origin main
           git push
