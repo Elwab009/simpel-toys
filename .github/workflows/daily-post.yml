@@ -45,7 +45,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node index.js
 
-      - name: Committer et pousser l'image generee
+    - name: Committer et pousser l'image generee
         run: |
           git config user.name "simpletoys-bot"
           git config user.email "bot@simpletoys.local"
@@ -54,8 +54,10 @@ jobs:
           git pull --rebase origin main
           git push
 
-      - name: Attendre que GitHub rende l'image accessible publiquement
-        run: sleep 20
+      - name: Forcer jsDelivr a recuperer la nouvelle image
+        run: |
+          curl -s "https://purge.jsdelivr.net/gh/Elwab009/simpel-toys@main/instagram-bot/posts/" > /dev/null
+          sleep 15
 
       - name: Etape 2 - Publier via le webhook Make.com
         env:
@@ -71,7 +73,3 @@ jobs:
           git commit -m "Mise a jour historique" || echo "Rien a committer"
           git pull --rebase origin main
           git push
-          - name: Forcer jsDelivr à récupérer la nouvelle image
-        run: |
-          curl -s "https://purge.jsdelivr.net/gh/Elwab009/simpel-toys@main/social-bot/generated/" > /dev/null
-          sleep 10
