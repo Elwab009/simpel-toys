@@ -71,3 +71,7 @@ jobs:
           git commit -m "Mise a jour historique" || echo "Rien a committer"
           git pull --rebase origin main
           git push
+          - name: Forcer jsDelivr à récupérer la nouvelle image
+        run: |
+          curl -s "https://purge.jsdelivr.net/gh/Elwab009/simpel-toys@main/social-bot/generated/" > /dev/null
+          sleep 10
