@@ -14,7 +14,7 @@ const REPO = process.env.GITHUB_REPOSITORY; // fourni automatiquement par GitHub
 const BRANCH = process.env.GITHUB_REF_NAME || 'main';
 
 function rawUrl(filename) {
-  return `https://raw.githubusercontent.com/${REPO}/${BRANCH}/instagram-bot/posts/${filename}`;
+  return `https://cdn.jsdelivr.net/gh/${REPO}@${BRANCH}/instagram-bot/posts/${filename}`;
 }
 
 // ---------- ETAPE 1 : choisir un produit, generer image + legende, sauver localement ----------
