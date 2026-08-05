@@ -14,8 +14,7 @@ const TRUST_FR = [
   "Livraison rapide, paiement à la réception.",
   "Des centaines de familles nous font déjà confiance.",
   "Produit contrôlé avant chaque envoi.",
-  "Simple Toys Maroc, votre grossiste jouets à Derb Omar."
-];
+  "Simple Toys Maroc, votre vendeur de jouets à Casablanca."
 const CTA_FR = [
   "Commandez dès aujourd'hui, stock limité !",
   "Contactez-nous en message privé pour commander.",
