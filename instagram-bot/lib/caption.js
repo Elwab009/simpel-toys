@@ -43,10 +43,10 @@ const CTA_DARIJA = [
 ];
 
 const HASHTAG_POOL = [
-  '#Casablanca', '#CasaCity', '#Maroc', '#MarocShopping', '#DerbOmar',
+  '#Casablanca', '#CasaCity', '#Maroc', '#MarocShopping', '#CasablancaShopping',
   '#JouetsMaroc', '#ToysMorocco', '#CadeauEnfant', '#SimpleToysMaroc',
   '#JouetsCasablanca', '#GrossisteJouets', '#كازابلانكا', '#المغرب',
-  '#لعب_الاطفال', '#تسوق_المغرب', '#درب_عمر'
+  '#لعب_الاطفال', '#تسوق_المغرب'
 ];
 
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -78,7 +78,7 @@ function localCaption(product) {
 async function generateCaption(product) {
   if (!GEMINI_API_KEY) return localCaption(product);
 
-  const prompt = `Tu es le community manager de "Simple Toys Maroc", un grossiste de jouets a Derb Omar, Casablanca.
+  const prompt = 'Tu es le community manager de "Simple Toys Maroc", un vendeur de jouets a Casablanca.
 Ecris une legende Instagram COURTE pour ce produit :
 - Nom : ${product.name}
 - Prix : ${product.price} DHS
