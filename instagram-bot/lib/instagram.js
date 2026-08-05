@@ -6,9 +6,10 @@ const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
  * Meta Graph API necessaire de notre cote).
  */
 async function publishToInstagram(imageUrl, caption) {
-  if (!MAKE_WEBHOOK_URL) {
-    throw new Error('MAKE_WEBHOOK_URL manquant (secret GitHub non configure).');
+  if (!imageUrl || !caption) {
+    throw new Error(`Donnees incompletes, publication annulee (imageUrl=${imageUrl}, caption=${caption ? 'ok' : 'vide'}).`);
   }
+  if (!MAKE_WEBHOOK_URL) {
 
   const res = await fetch(MAKE_WEBHOOK_URL, {
     method: 'POST',
