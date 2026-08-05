@@ -15,6 +15,7 @@ const TRUST_FR = [
   "Des centaines de familles nous font déjà confiance.",
   "Produit contrôlé avant chaque envoi.",
   "Simple Toys Maroc, votre vendeur de jouets à Casablanca."
+];
 const CTA_FR = [
   "Commandez dès aujourd'hui, stock limité !",
   "Contactez-nous en message privé pour commander.",
@@ -33,7 +34,7 @@ const TRUST_DARIJA = [
   "جودة مضمونة، الستوك متوفر فالكازا.",
   "توصيل سريع، الخلاص عند الاستلام.",
   "بزاف ديال الناس واثقين فينا.",
-  "Simple Toys Maroc، الموردين ديال اللعب فدرب عمر."
+  "Simple Toys Maroc، الموردين ديال اللعب فكازابلانكا."
 ];
 const CTA_DARIJA = [
   "طلبو دابا، الستوك محدود!",
@@ -78,7 +79,7 @@ function localCaption(product) {
 async function generateCaption(product) {
   if (!GEMINI_API_KEY) return localCaption(product);
 
-  const prompt = 'Tu es le community manager de "Simple Toys Maroc", un vendeur de jouets a Casablanca.
+  const prompt = `Tu es le community manager de "Simple Toys Maroc", un vendeur de jouets a Casablanca.
 Ecris une legende Instagram COURTE pour ce produit :
 - Nom : ${product.name}
 - Prix : ${product.price} DHS
