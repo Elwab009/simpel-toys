@@ -2,7 +2,7 @@ const sharp = require('sharp');
 
 const CANVAS = 1080;
 const BRAND = 'SIMPLE TOYS MAROC';
-const BRAND_SUB = 'Derb Omar — Casablanca';
+const BRAND_SUB = 'Casablanca';
 
 const CATEGORY_PALETTES = {
   'Véhicules & RC':      { band: '#1e3a5f', price: '#38bdf8' },
