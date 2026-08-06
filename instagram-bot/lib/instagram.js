@@ -10,6 +10,8 @@ async function publishToInstagram(imageUrl, caption) {
     throw new Error(`Donnees incompletes, publication annulee (imageUrl=${imageUrl}, caption=${caption ? 'ok' : 'vide'}).`);
   }
   if (!MAKE_WEBHOOK_URL) {
+    throw new Error('MAKE_WEBHOOK_URL manquant (secret GitHub non configure).');
+  }
 
   const res = await fetch(MAKE_WEBHOOK_URL, {
     method: 'POST',
