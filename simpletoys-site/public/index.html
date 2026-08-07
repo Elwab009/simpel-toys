@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple Toys Maroc - Boutique de jouets en ligne a Casablanca. Piscines gonflables, voitures telecommandees, cuisines jouets, poupees et jeux de role. Paiement a la livraison, livraison rapide partout au Maroc.">
     <title>SIMPLE TOYS - Jouets au Maroc</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -68,7 +69,7 @@
                     <span class="text-gold font-bold text-xl">S</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-navy tracking-tight">SIMPLE TOYS</h1>
+                    <h2 class="text-xl font-bold text-navy tracking-tight">SIMPLE TOYS</h2>
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest -mt-1" data-i18n="tagline">Vente de Jouets</p>
                 </div>
             </div>
@@ -186,7 +187,7 @@
         <div id="page-catalog" class="page hidden-page">
             <div class="bg-white shadow-sm">
                 <div class="container mx-auto px-4 py-8">
-                    <h1 class="text-3xl font-bold text-navy" data-i18n="catalog_title">Catalogue</h1>
+                    <h2 class="text-3xl font-bold text-navy" data-i18n="catalog_title">Catalogue</h2>
                     <p class="text-gray-500 mt-2" data-i18n="catalog_subtitle">Découvrez tous nos produits à prix fixe, quelle que soit la quantité.</p>
                     <div class="mt-6 flex flex-col md:flex-row gap-4">
                         <input type="text" id="search-input" onkeyup="filterProducts()" data-i18n-placeholder="search_placeholder" placeholder="Rechercher un jouet (ex: Frozen, Voiture, 923)..." class="w-full md:w-1/2 px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-teal">
@@ -217,7 +218,7 @@
         <!-- PAGE PANIER / COMMANDE -->
         <div id="page-cart" class="page hidden-page">
             <div class="container mx-auto px-4 py-16 max-w-4xl">
-                <h1 class="text-3xl font-bold text-navy mb-8" data-i18n="cart_page_title">Finaliser ma commande</h1>
+                <h2 class="text-3xl font-bold text-navy mb-8" data-i18n="cart_page_title">Finaliser ma commande</h2>
                 <div id="cart-items-container" class="bg-white rounded-xl p-8 shadow-sm"></div>
             </div>
         </div>
@@ -227,7 +228,7 @@
             <div class="container mx-auto px-4 py-20 max-w-lg text-center">
                 <div class="bg-white rounded-2xl p-10 shadow-sm">
                     <i class="fa-solid fa-circle-check text-teal text-6xl mb-6"></i>
-                    <h1 class="text-2xl font-bold text-navy mb-3" data-i18n="confirm_title">Commande confirmée !</h1>
+                    <h2 class="text-2xl font-bold text-navy mb-3" data-i18n="confirm_title">Commande confirmée !</h2>
                     <p class="text-gray-500 mb-2" data-i18n="confirm_subtitle">Un email de confirmation vous a été envoyé.</p>
                     <p id="confirm-order-number" class="text-xl font-bold text-teal my-4"></p>
                     <p class="text-gray-500 text-sm mb-8" data-i18n="confirm_track_hint">Gardez ce numéro pour suivre votre commande à tout moment.</p>
@@ -242,7 +243,7 @@
         <!-- PAGE SUIVI DE COMMANDE -->
         <div id="page-track" class="page hidden-page">
             <div class="container mx-auto px-4 py-16 max-w-2xl">
-                <h1 class="text-3xl font-bold text-navy mb-2 text-center" data-i18n="track_title">Suivre ma commande</h1>
+                <h2 class="text-3xl font-bold text-navy mb-2 text-center" data-i18n="track_title">Suivre ma commande</h2>
                 <p class="text-gray-500 text-center mb-10" data-i18n="track_subtitle">Entrez votre numéro de commande et votre email ou téléphone</p>
                 <div class="bg-white rounded-xl p-8 shadow-sm">
                     <form id="track-form" class="grid md:grid-cols-2 gap-4">
@@ -259,7 +260,7 @@
         <!-- PAGE CONTACT -->
         <div id="page-contact" class="page hidden-page">
             <div class="container mx-auto px-4 py-16 max-w-4xl">
-                <h1 class="text-3xl font-bold text-navy mb-8 text-center" data-i18n="contact_title">Contactez Simple Toys</h1>
+                <h2 class="text-3xl font-bold text-navy mb-8 text-center" data-i18n="contact_title">Contactez Simple Toys</h2>
                 <div class="grid md:grid-cols-2 gap-12">
                     <div class="space-y-6">
                         <div class="flex items-start space-x-4">
@@ -291,7 +292,7 @@
         <!-- PAGE A PROPOS -->
         <div id="page-about" class="page hidden-page">
             <div class="container mx-auto px-4 py-16 max-w-4xl text-center">
-                <h1 class="text-4xl font-bold text-navy mb-6" data-i18n="about_title">À Propos de Simple Toys</h1>
+                <h2 class="text-4xl font-bold text-navy mb-6" data-i18n="about_title">À Propos de Simple Toys</h2>
                 <p class="text-gray-600 text-lg mb-10" data-i18n="about_text">Simple Toys est spécialisé dans la vente de jouets de qualité, à prix fixes, pour toute la famille.</p>
                 <div class="grid md:grid-cols-3 gap-8 mt-12">
                     <div class="bg-white p-6 rounded-xl shadow-sm">
@@ -331,7 +332,7 @@
         <div id="page-admin" class="page hidden-page">
             <div class="container mx-auto px-4 py-10">
                 <div class="flex justify-between items-center mb-8">
-                    <h1 class="text-3xl font-bold text-navy">Panneau de Gestion</h1>
+                    <h2 class="text-3xl font-bold text-navy">Panneau de Gestion</h2>
                     <button onclick="logoutAdmin()" class="text-red-500 text-sm font-semibold">Déconnexion</button>
                 </div>
 
@@ -707,7 +708,7 @@
                 </div>
                 <div>
                     <span class="text-sm text-gray-400 font-semibold uppercase">${t('ref_label')}: ${product.ref} | ${cat}</span>
-                    <h1 class="text-3xl font-bold text-navy mt-2 mb-4">${name}</h1>
+                    <h2 class="text-3xl font-bold text-navy mt-2 mb-4">${name}</h2>
                     <p class="text-4xl font-extrabold text-teal mb-1">${product.price.toFixed(2)} <span class="text-lg">DHS</span></p>
                     <p class="text-sm text-gray-400 mb-6">${t('price_unit_default')}</p>
 
