@@ -1,6 +1,2 @@
 User-agent: *
 Allow: /
-Disallow: /admin
-Disallow: /api/
-
-Sitemap: https://simpel-toys-production.up.railway.app/sitemap.xml
